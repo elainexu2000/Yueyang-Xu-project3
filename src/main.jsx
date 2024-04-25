@@ -1,14 +1,19 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
-import PokemonPage from './PokemonPage.jsx'
-import PasswordManagerPage from './PasswordManagerPage.jsx'
 import { RouterProvider, createBrowserRouter } from 'react-router-dom'
+
+import PokemonPage from './PokemonPage.jsx'
 import PokemonLoginPage from './PokemonLoginPage.jsx'
 import PokemonRegisterPage from './PokemonRegisterPage.jsx'
+
+import PasswordManagerPage from './PasswordManagerPage.jsx'
+import PasswordLoginPage from './PasswordLoginPage.jsx'
+import PasswordRegisterPage from './PasswordRegisterPage.jsx'
+import Home from './Home.jsx'
+
 //import './index.css'
 
-const router = createBrowserRouter([
+const pokemonRouter = createBrowserRouter([
   {
     path: '/login',
     element: <PokemonLoginPage/>
@@ -27,10 +32,31 @@ const router = createBrowserRouter([
   }
 ])
 
+const passwordRouter = createBrowserRouter([
+  {
+    path: '/login',
+    element: <PasswordLoginPage/>
+  },
+  {
+    path: '/register',
+    element: <PasswordRegisterPage/>
+  },
+  {
+    path: '/password',
+    element: <PasswordManagerPage/>
+  },
+  {
+    path: '/',
+    element: <Home/>
+  }
+])
+
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     {/* <PokemonPage /> */}
     {/* <PasswordManagerPage></PasswordManagerPage> */}
-    <RouterProvider router={router} />
+    {/* <RouterProvider router={pokemonRouter} /> */}
+    <RouterProvider router={passwordRouter} />
   </React.StrictMode>,
 )

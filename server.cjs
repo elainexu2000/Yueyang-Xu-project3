@@ -4,12 +4,14 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 
 // debug switch
-const pokemon_mode = true;
+const pokemon_mode = false;
 
 //Routers
 const pokemonRouter = require('./backend/pokemon.cjs');
 const pokemonUserRouter = require('./backend/pokemon.user.api.cjs');
+
 const passwordRouter = require('./backend/password.api.cjs');
+const passwordUserRouter = require('./backend/password.user.api.cjs');
 
 const app = express();
 
@@ -31,45 +33,23 @@ if(pokemon_mode){
 }
 else{
     app.use('/api/password', passwordRouter);
+    app.use('/api/passwordUser', passwordUserRouter);
 }
 
+//uncomment when done
+// let frontend_dir = path.join(__dirname, 'dist')
 
-let frontend_dir = path.join(__dirname, 'dist')
+// app.use(express.static(frontend_dir));
+// app.get('*', function (req, res) {
+//     console.log("received request");
+//     res.sendFile(path.join(frontend_dir, "index.html"));
+// });
 
-app.use(express.static(frontend_dir));
-app.get('*', function (req, res) {
-    console.log("received request");
-    res.sendFile(path.join(frontend_dir, "index.html"));
-});
+// app.listen(process.env.PORT || 8000, function() {
+//     console.log("Starting app now...")
+// })
 
-app.listen(process.env.PORT || 8000, function() {
-    console.log("Starting app now...")
+app.listen(8000, function(){
+    console.log("Starting app");
 })
-
-// app.get('/', function(request, response){
-//     response.send("Hello again, web dev");
-// });
-
-// app.listen(8000, function(){
-//     console.log("Starting app");
-// })
-
-
-// run this app: npm run start
-//npm init
-    //enter through everything
-//npm install --save express
-//nodemon <filename.js>
-
-
-// const server = http.createServer((req, res) =>{
-//     res.writeHead(200, {'Content-Type': 'text/plain'});
-//     res.end('Hello web dev! ');
-// });
-// server.listen(8000, "127.0.0.1", () =>{
-//     console.log('Starting server');
-// })
-
-//start server: node <filename.js>
-
 
