@@ -24,6 +24,8 @@ function PasswordManagerPage(){
     
     const [username, setUsername] = useState('');
 
+    const [shareRequests, setShareRequests] = useState([]);
+    
     function updateDomain(event){
         setDomainState(event.target.value);
     }
@@ -97,56 +99,6 @@ function PasswordManagerPage(){
         }
         return false;
     }
-
-    // function generatePassword(alphabet, numeral, symbol, length){
-    //     return 'TESTPASSWORDDDD';
-    // }
-    // function generatePassword(alphabetState, numeralsState, symbolsState, lengthState) {
-    //     return new Promise((resolve, reject) => {
-    //         const lowercaseLetters = 'abcdefghijklmnopqrstuvwxyz';
-    //         const uppercaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    //         const numbers = '0123456789';
-    //         const symbols = '!@#$%^&*()_-+=[]{}|;:,.<>?';
-    
-    //         let characters = '';
-    //         let password = '';
-    
-    //         if (alphabetState) {
-    //             characters += lowercaseLetters;
-    //             characters += uppercaseLetters;
-    //         }
-    //         if (numeralsState) {
-    //             characters += numbers;
-    //         }
-    //         if (symbolsState) {
-    //             characters += symbols;
-    //         }
-    
-    //         // Check if at least one checkbox is selected
-    //         if (characters.length === 0) {
-    //             reject(new Error("Please check at least one checkbox."));
-    //             return;
-    //         }
-    
-    //         // Generate password with at least one representation of each selected character type
-    //         password += getRandomCharacter(lowercaseLetters); // Add at least one lowercase letter
-    //         password += getRandomCharacter(uppercaseLetters); // Add at least one uppercase letter
-    //         password += getRandomCharacter(numbers); // Add at least one number
-    //         password += getRandomCharacter(symbols); // Add at least one symbol
-    
-    //         // Generate the rest of the password randomly
-    //         for (let i = password.length; i < lengthState; i++) {
-    //             password += characters.charAt(Math.floor(Math.random() * characters.length));
-    //         }
-    
-    //         resolve(password);
-    //     });
-    // }
-    
-    // function getRandomCharacter(characters) {
-    //     return characters.charAt(Math.floor(Math.random() * characters.length));
-    // }
-
     function generatePassword(alphabetState, numeralsState, symbolsState, lengthState) {
         const lowercaseLetters = 'abcdefghijklmnopqrstuvwxyz';
         const uppercaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -166,12 +118,6 @@ function PasswordManagerPage(){
         if (symbolsState) {
             characters += symbols;
         }
-    
-        // Check if at least one checkbox is selected
-        if (characters.length === 0) {
-            throw new Error("Please check at least one checkbox.");
-        }
-    
         // Generate password with at least one representation of each selected character type
         password += getRandomCharacter(lowercaseLetters); // Add at least one lowercase letter
         password += getRandomCharacter(uppercaseLetters); // Add at least one uppercase letter
@@ -328,7 +274,6 @@ function PasswordManagerPage(){
     useEffect(onStart, []);
 
     const displayedPasswords = [];
-    
     for(let i = 0; i < passwordListState.length; i++){
         displayedPasswords.push(
         <li>Domain: {passwordListState[i].domain} 
@@ -337,6 +282,9 @@ function PasswordManagerPage(){
             - <button onClick={() => setEditPassword(passwordListState[i]._id, passwordListState[i].domain, passwordListState[i].password)}>Edit</button>
         </li>);
     }
+
+    const sharedPasswords = [];
+    
 
     //share password:
 
@@ -398,6 +346,11 @@ function PasswordManagerPage(){
         <ul>
           {displayedPasswords}
         </ul>
+
+        <h2>Share Passwords</h2>
+
+        <div></div>
+        <h2>Here are all password shared with you!</h2>
 
         <div> 
             <h2>-------------------------------------------------------------------------</h2>

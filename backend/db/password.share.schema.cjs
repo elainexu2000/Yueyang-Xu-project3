@@ -11,8 +11,8 @@ module.exports = new Schema({
     },
     status: {
         type: String,
-        enum: ['accepted', 'rejected'],
-        default: 'rejected'
+        enum: ['accepted', 'pending', 'rejected'],
+        default: 'pending'
     },
     createdAt: {
         type: Date,

@@ -6,7 +6,7 @@ async function addShareRequest(requesterUsername, recipientUsername) {
     const shareRequest = new PasswordShareModel({
         requesterUsername,
         recipientUsername,
-        status: 'rejected' // New requests start as rejected
+        status: 'pending'
     });
     return await shareRequest.save();
 }

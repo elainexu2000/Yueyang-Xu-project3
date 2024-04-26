@@ -7,8 +7,8 @@ const path = require('path');
 const pokemon_mode = false;
 
 //Routers
-const pokemonRouter = require('./backend/pokemon.cjs');
-const pokemonUserRouter = require('./backend/pokemon.user.api.cjs');
+//const pokemonRouter = require('./backend/pokemon.cjs');
+//const pokemonUserRouter = require('./backend/pokemon.user.api.cjs');
 
 const passwordRouter = require('./backend/password.api.cjs');
 const passwordUserRouter = require('./backend/password.user.api.cjs');
