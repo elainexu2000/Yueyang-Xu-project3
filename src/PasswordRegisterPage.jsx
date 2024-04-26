@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useState } from 'react';
+import { useNavigate } from 'react-router';
 import NavBar from './NavBar';
 
 function PasswordRegisterPage() {
@@ -7,7 +8,7 @@ function PasswordRegisterPage() {
     const [passwordState, setPasswordState] = useState('');
     const [verifyPasswordState, setVerifyPasswordState] = useState('');
     const [errorMsgState, setErrorMsgState] = useState('');
-  
+    const navigate = useNavigate();
 
     async function onSubmit() {
       setErrorMsgState('')
@@ -15,7 +16,6 @@ function PasswordRegisterPage() {
         setErrorMsgState('Please enter a username. ');
         return;
       }
-      // verify password
       if(verifyPasswordState !== passwordState) {
         setErrorMsgState('Error: Passwords mismatch. ');
         return;
@@ -25,7 +25,7 @@ function PasswordRegisterPage() {
             username: usernameState,
             password: passwordState,
         });
-
+        navigate('/password');
         setPasswordState('');
         setUsernameState('');
         setVerifyPasswordState('');

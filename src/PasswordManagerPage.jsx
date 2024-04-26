@@ -6,6 +6,8 @@ import NavBar from './NavBar';
 function PasswordManagerPage(){
     const navigate = useNavigate();
     const [passwordListState, setPasswordListState] = useState([]);
+    const [shareRequestListState, setShareRequestListState] = useState([]);
+    const [sharedPasswordListState, setSharedPasswordListState] = useState([]);
 
     const [domainState, setDomainState] = useState('');
     const [providedPasswordState, setProvidedPasswordState] = useState('');
@@ -23,8 +25,7 @@ function PasswordManagerPage(){
       });
     
     const [username, setUsername] = useState('');
-
-    const [shareRequests, setShareRequests] = useState([]);
+    const [shareUsername, setShareUsername] = useState('');
     
     function updateDomain(event){
         setDomainState(event.target.value);
@@ -54,11 +55,46 @@ function PasswordManagerPage(){
             break;
         }
       };
+    
+    function updateShareUsername(event){
+        setShareUsername(event.target.value);
+    }
 
     async function getAllPassword(){
         try{
             const response = await axios.get('/api/password');
             setPasswordListState(response.data);
+        }
+        catch(error){
+            console.log(error);
+            if (error.response && error.response.data) {
+                setErrorMessageState(error.response.data);
+            } else {
+                setErrorMessageState("An error occurred while processing the request.");
+            }
+        }
+    }
+
+    async function getAllShareRequests(){
+        try{
+            const response = await axios.get('/api/share/requests');
+            setShareRequestListState(response.data);
+        }
+        catch(error){
+            console.log(error);
+            if (error.response && error.response.data) {
+                setErrorMessageState(error.response.data);
+            } else {
+                setErrorMessageState("An error occurred while processing the request.");
+            }
+        }
+    }
+
+    async function getAllSharedPasswords(){
+        try{
+            const response = await axios.get('/api/share/passwords');
+            console.log(response);
+            setSharedPasswordListState(response.data);
         }
         catch(error){
             console.log(error);
@@ -85,6 +121,7 @@ function PasswordManagerPage(){
             }
         }
     }
+    
     function isValidLength(lengthState) {
         lengthState = lengthState.trim();
         if (lengthState === '') {
@@ -118,13 +155,11 @@ function PasswordManagerPage(){
         if (symbolsState) {
             characters += symbols;
         }
-        // Generate password with at least one representation of each selected character type
-        password += getRandomCharacter(lowercaseLetters); // Add at least one lowercase letter
-        password += getRandomCharacter(uppercaseLetters); // Add at least one uppercase letter
-        password += getRandomCharacter(numbers); // Add at least one number
-        password += getRandomCharacter(symbols); // Add at least one symbol
+        password += getRandomCharacter(lowercaseLetters); 
+        password += getRandomCharacter(uppercaseLetters); 
+        password += getRandomCharacter(numbers); 
+        password += getRandomCharacter(symbols);
     
-        // Generate the rest of the password randomly
         for (let i = password.length; i < lengthState; i++) {
             password += characters.charAt(Math.floor(Math.random() * characters.length));
         }
@@ -163,13 +198,13 @@ function PasswordManagerPage(){
         
         if(providedPasswordState){
             try{
-                if(editingState.isEditing){ //if editing, put
+                if(editingState.isEditing){
                     await axios.put('/api/password/' + editingState.editingId, 
                     {domain: domainState, password: providedPasswordState});
                     setMessageState("Password for domain " + domainState + " updated successfully! ");
                     setErrorMessageState("");
                 }
-                else{ //if creating new
+                else{
                     await axios.post('/api/password/', { domain: domainState, password: providedPasswordState });
                     setMessageState("Password entry for domain " + domainState + " added successfully! ");
                 }
@@ -184,8 +219,6 @@ function PasswordManagerPage(){
                     isEditing: false,
                     editingId: ''
                 });
-                // setErrorMessageState('');
-                // setMessageState('');
                 await getAllPassword();
             }
             catch(error){
@@ -196,6 +229,25 @@ function PasswordManagerPage(){
                     setErrorMessageState("An error occurred while processing the request.");
                 }
             }
+        }
+    }
+
+    async function onSubmitShareRequest(){
+        setErrorMessageState("");
+        setMessageState("");
+        try{
+            await axios.post('/api/share/', { requesterUsername: username, recipientUsername: shareUsername });
+            setMessageState("Share request sent successfully! ");
+            setShareUsername('');
+        }
+        catch(error){
+            console.log(error);
+            if (error.response && error.response.data) {
+                setErrorMessageState(error.response.data);
+            } else {
+                setErrorMessageState("An error occurred while processing the request.");
+            }
+            setShareUsername('');
         }
     }
     
@@ -209,17 +261,11 @@ function PasswordManagerPage(){
       }
 
     function onClearPassword(){
-        //setDomainState('');
         setProvidedPasswordState('');
-
         setAlphabetState(false);
         setNumeralsState(false);
         setSymbolsState(false);
         setLengthState('');
-        // setEditingState({
-        //     isEditing: false,
-        //     editingId: ''
-        //   });
         setErrorMessageState('');
         setMessageState('');
     }
@@ -267,8 +313,74 @@ function PasswordManagerPage(){
     function onStart() {
         isLoggedIn()
         .then(() => {
-        getAllPassword()
+        getAllPassword();
+        getAllShareRequests();
+        getAllSharedPasswords();
         })
+    }
+
+    async function approveShareRequest(requestId){
+        try{
+            await axios.put('/api/share/' + requestId, 
+            {status: 'accepted'});
+            setMessageState("Request approved successfully! ");
+            setErrorMessageState("");
+        
+            setDomainState('');
+            setProvidedPasswordState('');
+            setAlphabetState(false);
+            setNumeralsState(false);
+            setSymbolsState(false);
+            setLengthState('');
+
+            setEditingState({
+                isEditing: false,
+                editingId: ''
+            });
+            await getAllPassword();
+            await getAllShareRequests();
+            await getAllSharedPasswords();
+        }
+        catch(error){
+            console.log(error);
+            if (error.response && error.response.data) {
+                setErrorMessageState(error.response.data);
+            } else {
+                setErrorMessageState("An error occurred while processing the request.");
+            }
+        }
+    }
+
+    async function rejectShareRequest(requestId){
+        try{
+            await axios.put('/api/share/' + requestId, 
+            {status: 'rejected'});
+            setMessageState("Request rejected successfully! ");
+            setErrorMessageState("");
+        
+            setDomainState('');
+            setProvidedPasswordState('');
+            setAlphabetState(false);
+            setNumeralsState(false);
+            setSymbolsState(false);
+            setLengthState('');
+
+            setEditingState({
+                isEditing: false,
+                editingId: ''
+            });
+            await getAllPassword();
+            await getAllShareRequests();
+            await getAllSharedPasswords();
+        }
+        catch(error){
+            console.log(error);
+            if (error.response && error.response.data) {
+                setErrorMessageState(error.response.data);
+            } else {
+                setErrorMessageState("An error occurred while processing the request.");
+            }
+        }
     }
 
     useEffect(onStart, []);
@@ -282,13 +394,25 @@ function PasswordManagerPage(){
             - <button onClick={() => setEditPassword(passwordListState[i]._id, passwordListState[i].domain, passwordListState[i].password)}>Edit</button>
         </li>);
     }
-
-    const sharedPasswords = [];
     
+    const displayedShareRequests = [];
+    for(let i = 0; i < shareRequestListState.length; i++){
+        displayedShareRequests.push(
+            <li>User: {shareRequestListState[i].requesterUsername} 
+            - <button onClick={() => approveShareRequest(shareRequestListState[i]._id)}>Accept</button>
+            - <button onClick={() => rejectShareRequest(shareRequestListState[i]._id)}>Reject</button>
+            </li>);
+    }
 
-    //share password:
+    const displayedSharedPasswords = [];
+    for(let i = 0; i < sharedPasswordListState.length; i++){
+        displayedSharedPasswords.push(
+        <li>Domain: {sharedPasswordListState[i].domain} 
+            - Password: {sharedPasswordListState[i].password}
+            - Owner: {sharedPasswordListState[i].user}
+        </li>);
+    }
 
-    //shared with me
   const inputFieldTitleText = editingState.isEditing? "Edit Password" : "Add New Password";
 
     return (
@@ -342,25 +466,24 @@ function PasswordManagerPage(){
         <h3 id='errorMessage'>Error Message: {errorMessageState? errorMessageState : ""}</h3>
         <h3 id='message'>Regular Message: {messageState? messageState : ''}</h3>
         
-        <h2>Here are all your passwords !!!</h2>
+        <h2>Your Passwords</h2>
         <ul>
           {displayedPasswords}
         </ul>
+        
+        <h2>Share Password</h2>
+        <div><label>Enter Username: </label><input value={shareUsername} onInput={(event) => updateShareUsername(event)}></input></div>
+        <button onClick={()=> onSubmitShareRequest()}>Submit</button>
 
-        <h2>Share Passwords</h2>
-
-        <div></div>
-        <h2>Here are all password shared with you!</h2>
-
-        <div> 
-            <h2>-------------------------------------------------------------------------</h2>
-            <h2>State Monitor:</h2>
-            <h3>Domain State: {domainState}</h3>
-            <h3>Provided Password State: {providedPasswordState}</h3>
-            <h3>Alphabet: {alphabetState? 1:0}</h3>
-            <h3>Numerals: {numeralsState? 1:0}</h3>
-            <h3>Symbol: {symbolsState? 1:0}</h3>
-        </div>
+        <h2>Your Pending Share Requests</h2>
+        <ul>
+            {displayedShareRequests}
+        </ul>
+            
+        <h2>Passwords Shared with You</h2>
+        <ul>
+            {displayedSharedPasswords}
+        </ul>
         </>
     );
 }

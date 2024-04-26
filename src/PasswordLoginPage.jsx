@@ -17,7 +17,6 @@ function PasswordLoginPage() {
             username: usernameState,
             password: passwordState,
         });
-
         navigate('/password');
       } catch (error) {
           setErrorMsgState(error.response.data);

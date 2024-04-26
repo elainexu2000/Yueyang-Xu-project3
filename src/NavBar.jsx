@@ -36,13 +36,27 @@ function NavBar() {
 
   const renderNavItems = () => {
     if (location.pathname === '/login') {
-    } 
-    else if (location.pathname === '/register') {
-    } 
-    else if (location.pathname === '/password') {
       return (
         <ul>
           <li><Link to="/">Home</Link></li>
+          <li><Link to="/register">Register</Link></li>
+        </ul>
+      );
+    } 
+    else if (location.pathname === '/register') {
+      return (
+        <ul>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/login">Log In</Link></li>
+        </ul>
+      );
+    } 
+    else 
+    if (location.pathname === '/password') {
+      return (
+        <ul>
+          <li><Link to="/">Home</Link></li>
+          <li><Link to="/password">Password Manager</Link></li>
           <li><button onClick={logout}>Log Out</button></li>
           <li>{username}</li>
         </ul>
@@ -52,13 +66,15 @@ function NavBar() {
       return (
         <ul>
           <li><Link to="/">Home</Link></li>
-          {isAuthenticated ? (
+          {isAuthenticated ? 
+          (
             <>
               <li><Link to="/password">Password Manager</Link></li>
               <li><button onClick={logout}>Log Out</button></li>
               <li>{username}</li>
             </>
-          ) : (
+          ) : 
+          (
             <>
               <li><Link to="/login">Log In</Link></li>
               <li><Link to="/register">Register</Link></li>

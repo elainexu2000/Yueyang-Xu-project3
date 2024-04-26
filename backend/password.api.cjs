@@ -14,7 +14,7 @@ passwordRouter.post('/', async function(req, res){
     }
     if(!requestBody.domain || !requestBody.password){
         res.status(401);
-        return res.send("API: Please enter a non-empty domain. ")
+        return res.send("API error: Please enter a non-empty domain. ")
     }
     const newPasswordEntry = {
         domain : requestBody.domain,
@@ -84,6 +84,8 @@ passwordRouter.put('/:pwId', async function(req, res){
             return res.send("You do not own this password entry.");
         }
         const passwordUpdateResponse = await PasswordModel.updatePassword(passwordId, passwordData);
+        //const shareRequestUpdateResponse = await ShareModel.updateShareRequest(requestId, requestBody.status);
+
         return res.send(passwordUpdateResponse);
     }
     catch(error){

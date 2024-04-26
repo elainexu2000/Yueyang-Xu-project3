@@ -30,10 +30,11 @@ function getPasswordById(id){
 
 
 module.exports = {
+    PasswordModel,
     insertPassword,
     deletePassword,
     updatePassword,
     getAllPassword,
     getPasswordByUser,
-    getPasswordById
+    getPasswordById,
 }

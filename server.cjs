@@ -3,15 +3,9 @@ const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 
-// debug switch
-const pokemon_mode = false;
-
-//Routers
-//const pokemonRouter = require('./backend/pokemon.cjs');
-//const pokemonUserRouter = require('./backend/pokemon.user.api.cjs');
-
 const passwordRouter = require('./backend/password.api.cjs');
 const passwordUserRouter = require('./backend/password.user.api.cjs');
+const passwordShareRouter = require('./backend/share.api.cjs');
 
 const app = express();
 
@@ -26,15 +20,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({extended: true}));
 
-// debug switch
-if(pokemon_mode){
-    app.use('/api/pokemon', pokemonRouter);
-    app.use('/api/pokemonUser', pokemonUserRouter);
-}
-else{
-    app.use('/api/password', passwordRouter);
-    app.use('/api/passwordUser', passwordUserRouter);
-}
+app.use('/api/password', passwordRouter);
+app.use('/api/passwordUser', passwordUserRouter);
+app.use('/api/share', passwordShareRouter);
 
 //uncomment when done
 // let frontend_dir = path.join(__dirname, 'dist')
