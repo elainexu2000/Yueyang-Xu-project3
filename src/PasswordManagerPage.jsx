@@ -482,7 +482,7 @@ function PasswordManagerPage(){
         
         <h2>Your Passwords</h2>
         <ul>
-          {displayedPasswords}
+            {passwordListState.length <= 0? "You currently have no passwords. " : displayedPasswords}
         </ul>
         
         <h2>Share Password</h2>
@@ -495,12 +495,12 @@ function PasswordManagerPage(){
         
         <h2>Your Pending Share Requests</h2>
         <ul>
-            {shareRequestListState.length <= 0? 'You have no pending share requests. ' : displayedShareRequests}
+            {shareRequestListState.length <= 0? 'You currently have no pending share requests. ' : displayedShareRequests}
         </ul>
 
         <h2>Passwords Shared with You</h2>
         <ul>
-            {displayedSharedPasswords}
+            {sharedPasswordListState.length <= 0? "You currently have no shared passwords. " : displayedSharedPasswords}
         </ul>
         </>
     );
