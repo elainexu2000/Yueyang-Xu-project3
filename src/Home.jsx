@@ -8,9 +8,6 @@ function Home() {
     const [username, setUsername] = useState('');
 
     useEffect(() => {
-      }, []);
-
-    useEffect(() => {
         isLoggedIn();
     }, [isAuthenticated]);
 
