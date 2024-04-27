@@ -21,7 +21,9 @@ function NavBar() {
       setUsername(username);
       setIsAuthenticated(true);
     } catch (error) {
-      navigate('/');
+      //navigate('/');
+      setIsAuthenticated(false);
+      setUsername('');
     }
   };
 
