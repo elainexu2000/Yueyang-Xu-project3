@@ -28,14 +28,17 @@ function Home() {
             <h1>Home Page</h1>
             <NavBar isAuthenticated={isAuthenticated} username={username} />
             <h2>Product Description</h2>
-            <p>The goal of this project is to create a website that allows users to store, manage, and              share passwords for a variety of domains. 
-            </p>
-            <h2>Creators</h2>
-            <p>Yueyang Xu</p>
+            <ul>
+                The goal of this project is to create a website that allows users to store, manage, and              
+                share passwords for a variety of domains. It also serves as an introduction to components of
+                a full stack project. 
+            </ul>
+            <h2>Creator</h2>
+            <ul>Yueyang Xu</ul>
             <h2>Github Repository</h2>
-            <p>https://github.com/elainexu2000/Yueyang-Xu-project3</p>
+            <ul>https://github.com/elainexu2000/Yueyang-Xu-project3</ul>
             <h2>Render Deployment</h2>
-            <p>https://yueyang-xu-project3.onrender.com/</p>
+            <ul>https://yueyang-xu-project3.onrender.com/</ul>
         </>
     );
 }

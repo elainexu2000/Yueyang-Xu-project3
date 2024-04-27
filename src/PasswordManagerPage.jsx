@@ -353,6 +353,19 @@ function PasswordManagerPage(){
             }
         }
     }
+
+    function togglePasswordVisibility() {
+        const toggleButton = document.getElementById('togglePasswordButton');
+        const passwordInput = document.getElementById('passwordEntry');
+      
+        if (passwordInput.type === 'password') {
+          passwordInput.type = 'text'; 
+          toggleButton.textContent = 'Hide';
+        } else {
+          passwordInput.type = 'password';
+          toggleButton.textContent = 'Show';
+        }
+    }
     
     function onStart() {
         isLoggedIn()
@@ -417,26 +430,45 @@ function PasswordManagerPage(){
         </table>
       );      
 
-    const displayedSharedPasswords = (
-        <table className="shared-password-table">
-          <thead>
-            <tr>
-              <th>Domain</th>
-              <th>Password</th>
-              <th>Owner</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sharedPasswordListState.map((password, index) => (
-              <tr key={password._id}>
-                <td>{password.domain}</td>
-                <td>{password.password}</td>
-                <td>{password.user}</td>
+      const SharedPasswordsTable = ({ sharedPasswordListState }) => {
+        const [passwordVisibility, setPasswordVisibility] = useState({});
+      
+        const togglePasswordDisplayVisibility = (passwordId) => {
+          setPasswordVisibility((prevVisibility) => ({
+            ...prevVisibility,
+            [passwordId]: !prevVisibility[passwordId],
+          }));
+        };
+      
+        return (
+          <table className="shared-password-table">
+            <thead>
+              <tr>
+                <th>Domain</th>
+                <th>Password</th>
+                <th>Action</th>
+                <th>Owner</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      );      
+            </thead>
+            <tbody>
+              {sharedPasswordListState.map((password, index) => (
+                <tr key={password._id}>
+                  <td>{password.domain}</td>
+                  <td>
+                    {passwordVisibility[password._id] ? password.password : '******'}
+                  </td>
+                  <td>
+                    <button onClick={() => togglePasswordDisplayVisibility(password._id)}>
+                        {passwordVisibility[password._id] ? 'Hide' : 'Show'}
+                    </button>
+                  </td>
+                  <td>{password.user}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        );
+      };
 
   const inputFieldTitleText = editingState.isEditing? "Edit Password" : "Add New Password";
 
@@ -451,7 +483,11 @@ function PasswordManagerPage(){
         <h2>{inputFieldTitleText}</h2>
         <ul><div className='inputContainer'>
           <div><label>Domain (URL or other name): </label><input value={domainState} onInput={(event) => updateDomain(event)}></input></div>
-          <div><label>Password: </label><input value={providedPasswordState} onInput={(event) => updateProvidedPassword(event)}></input></div>
+          <div>
+            <label>Password: </label>
+            <input id = "passwordEntry" value={providedPasswordState} onInput={(event) => updateProvidedPassword(event)}></input>
+            <button id="togglePasswordButton" onClick={() =>togglePasswordVisibility()}>Show/Hide</button>
+        </div>
           <div><label>Length: </label><input value={lengthState} onInput={(event) => updateLength(event)}></input></div>
           
           <div className='checkboxContainer'>
@@ -500,7 +536,7 @@ function PasswordManagerPage(){
 
         <h2>Passwords Shared with You</h2>
         <ul>
-            {sharedPasswordListState.length <= 0? "You currently have no shared passwords. " : displayedSharedPasswords}
+            {sharedPasswordListState.length <= 0? "You currently have no shared passwords. " : <SharedPasswordsTable sharedPasswordListState={sharedPasswordListState}></SharedPasswordsTable>}
         </ul>
         </>
     );
