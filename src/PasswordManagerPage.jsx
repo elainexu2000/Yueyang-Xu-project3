@@ -136,40 +136,51 @@ function PasswordManagerPage(){
         }
         return false;
     }
+
     function generatePassword(alphabetState, numeralsState, symbolsState, lengthState) {
-        const lowercaseLetters = 'abcdefghijklmnopqrstuvwxyz';
-        const uppercaseLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        const numbers = '0123456789';
+        const alphabets = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const numerals = '0123456789';
         const symbols = '!@#$%^&*()_-+=[]{}|;:,.<>?';
     
-        let characters = '';
+        let availableCharacters = '';
         let password = '';
     
-        if (alphabetState) {
-            characters += lowercaseLetters;
-            characters += uppercaseLetters;
-        }
-        if (numeralsState) {
-            characters += numbers;
-        }
-        if (symbolsState) {
-            characters += symbols;
-        }
-        password += getRandomCharacter(lowercaseLetters); 
-        password += getRandomCharacter(uppercaseLetters); 
-        password += getRandomCharacter(numbers); 
+        if (alphabetState) 
+            availableCharacters += alphabets;
+        if (numeralsState) 
+            availableCharacters += numerals;
+        if (symbolsState) 
+            availableCharacters += symbols;
+        
+        password += getRandomCharacter(alphabets); 
+        password += getRandomCharacter(numerals); 
         password += getRandomCharacter(symbols);
     
-        for (let i = password.length; i < lengthState; i++) {
-            password += characters.charAt(Math.floor(Math.random() * characters.length));
-        }
-    
-        return password;
+        for (let i = password.length; i < lengthState; i++) 
+            password += getRandomCharacter(availableCharacters);
+
+        return shuffle(password);
     }
     
     function getRandomCharacter(characters) {
         return characters.charAt(Math.floor(Math.random() * characters.length));
     }
+
+    function shuffle(str) {
+        let array = str.split('');
+        let currentIndex = array.length;
+        let temporaryValue, randomIndex;
+      
+        while (currentIndex !== 0) {
+          randomIndex = Math.floor(Math.random() * currentIndex);
+          currentIndex--;
+          temporaryValue = array[currentIndex];
+          array[currentIndex] = array[randomIndex];
+          array[randomIndex] = temporaryValue;
+        }
+      
+        return array.join(''); 
+      }
 
     async function onSubmit(){
         setErrorMessageState("");
@@ -284,6 +295,7 @@ function PasswordManagerPage(){
         setErrorMessageState('');
         setMessageState('');
     }
+
     async function logout(){
         try{
             const response = await axios.post('/api/passwordUser/logout');
@@ -310,19 +322,10 @@ function PasswordManagerPage(){
         }
     }
 
-    function onStart() {
-        isLoggedIn()
-        .then(() => {
-        getAllPassword();
-        getAllShareRequests();
-        getAllSharedPasswords();
-        })
-    }
-
-    async function approveShareRequest(requestId){
+    async function updateShareRequest(requestId, newStatus){
         try{
             await axios.put('/api/share/' + requestId, 
-            {status: 'accepted'});
+            {status: newStatus});
             setMessageState("Request approved successfully! ");
             setErrorMessageState("");
         
@@ -350,68 +353,90 @@ function PasswordManagerPage(){
             }
         }
     }
-
-    async function rejectShareRequest(requestId){
-        try{
-            await axios.put('/api/share/' + requestId, 
-            {status: 'rejected'});
-            setMessageState("Request rejected successfully! ");
-            setErrorMessageState("");
-        
-            setDomainState('');
-            setProvidedPasswordState('');
-            setAlphabetState(false);
-            setNumeralsState(false);
-            setSymbolsState(false);
-            setLengthState('');
-
-            setEditingState({
-                isEditing: false,
-                editingId: ''
-            });
-            await getAllPassword();
-            await getAllShareRequests();
-            await getAllSharedPasswords();
-        }
-        catch(error){
-            console.log(error);
-            if (error.response && error.response.data) {
-                setErrorMessageState(error.response.data);
-            } else {
-                setErrorMessageState("An error occurred while processing the request.");
-            }
-        }
+    
+    function onStart() {
+        isLoggedIn()
+        .then(() => {
+        getAllPassword();
+        getAllShareRequests();
+        getAllSharedPasswords();
+        })
     }
 
     useEffect(onStart, []);
 
-    const displayedPasswords = [];
-    for(let i = 0; i < passwordListState.length; i++){
-        displayedPasswords.push(
-        <li>Domain: {passwordListState[i].domain} 
-            - Password: {passwordListState[i].password}
-            - <button onClick={() => deletePassword(passwordListState[i]._id)}>Delete</button>
-            - <button onClick={() => setEditPassword(passwordListState[i]._id, passwordListState[i].domain, passwordListState[i].password)}>Edit</button>
-        </li>);
-    }
-    
-    const displayedShareRequests = [];
-    for(let i = 0; i < shareRequestListState.length; i++){
-        displayedShareRequests.push(
-            <li>User: {shareRequestListState[i].requesterUsername} 
-            - <button onClick={() => approveShareRequest(shareRequestListState[i]._id)}>Accept</button>
-            - <button onClick={() => rejectShareRequest(shareRequestListState[i]._id)}>Reject</button>
-            </li>);
-    }
+    const displayedPasswords = (
+        <table className="password-table">
+          <thead>
+            <tr>
+              <th>Domain</th>
+              <th>Password</th>
+              <th>Delete</th>
+              <th>Edit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {passwordListState.map((password, index) => (
+              <tr key={password._id}>
+                <td>{password.domain}</td>
+                <td>{password.password}</td>
+                <td>
+                  <button onClick={() => deletePassword(password._id)}>Delete</button>
+                </td>
+                <td>
+                  <button onClick={() => setEditPassword(password._id, password.domain, password.password)}>Edit</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      );      
 
-    const displayedSharedPasswords = [];
-    for(let i = 0; i < sharedPasswordListState.length; i++){
-        displayedSharedPasswords.push(
-        <li>Domain: {sharedPasswordListState[i].domain} 
-            - Password: {sharedPasswordListState[i].password}
-            - Owner: {sharedPasswordListState[i].user}
-        </li>);
-    }
+    const displayedShareRequests = (
+        <table className="share-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Accept</th>
+              <th>Reject</th>
+            </tr>
+          </thead>
+          <tbody>
+            {shareRequestListState.map((req, index) => (
+              <tr key={req._id}>
+                <td>{req.requesterUsername}</td>
+                <td>
+                    <button onClick={() => updateShareRequest(req._id, 'accepted')}>Accept</button>
+                </td>
+                <td>
+                    <button onClick={() => updateShareRequest(req._id, 'rejected')}>Reject</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      );      
+
+    const displayedSharedPasswords = (
+        <table className="shared-password-table">
+          <thead>
+            <tr>
+              <th>Domain</th>
+              <th>Password</th>
+              <th>Owner</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sharedPasswordListState.map((password, index) => (
+              <tr key={password._id}>
+                <td>{password.domain}</td>
+                <td>{password.password}</td>
+                <td>{password.user}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      );      
 
   const inputFieldTitleText = editingState.isEditing? "Edit Password" : "Add New Password";
 
@@ -419,52 +444,41 @@ function PasswordManagerPage(){
         <>
         <h1>Password Manager</h1>
         <NavBar isAuthenticated={isLoggedIn()} username={username} />
-
+        <ul>
+            <div id='errorMessage'>{errorMessageState? errorMessageState : ""}</div>
+            <div id='message'>{messageState? messageState : ''}</div>
+        </ul>
         <h2>{inputFieldTitleText}</h2>
-
-        <div>
+        <ul><div className='inputContainer'>
           <div><label>Domain (URL or other name): </label><input value={domainState} onInput={(event) => updateDomain(event)}></input></div>
           <div><label>Password: </label><input value={providedPasswordState} onInput={(event) => updateProvidedPassword(event)}></input></div>
           <div><label>Length: </label><input value={lengthState} onInput={(event) => updateLength(event)}></input></div>
+          
+          <div className='checkboxContainer'>
+            <div>
+                <label htmlFor="alphabetCheckbox">Alphabet</label>
+                <input type="checkbox" id="alphabetCheckbox" name="alphabet" checked={alphabetState}
+                    onChange={(event) => toggleCheckbox(event)}/>
+            </div>
+            <div>
+                <label htmlFor="numeralsCheckbox">Numerals</label>
+                <input type="checkbox" id="numeralsCheckbox" name="numerals" checked={numeralsState}
+                    onChange={(event) => toggleCheckbox(event)}/>
+            </div>
+            <div>
+                <label htmlFor="symbolsCheckbox">Symbols</label>
+                <input type="checkbox" id="symbolsCheckbox" name="symbols" checked={symbolsState}
+                    onChange={(event) => toggleCheckbox(event)}/>
+            </div>
+        </div>
+
+        <div className='buttonContainer'>
           <button onClick={()=> onSubmit()}>Submit</button>
           <button onClick={()=> onClearPassword()}>Clear Password</button>
           {editingState.isEditing && <button onClick={() => onCancelEdit()}>Cancel Edit</button>}
         </div>
-
-        <div id='checkboxContainer'>
-            <div>
-                <label htmlFor="alphabetCheckbox">Alphabet</label>
-                <input
-                    type="checkbox"
-                    id="alphabetCheckbox"
-                    name="alphabet"
-                    checked={alphabetState}
-                    onChange={(event) => toggleCheckbox(event)}
-                />
-            </div>
-            <div>
-                <label htmlFor="numeralsCheckbox">Numerals</label>
-                <input
-                    type="checkbox"
-                    id="numeralsCheckbox"
-                    name="numerals"
-                    checked={numeralsState}
-                    onChange={(event) => toggleCheckbox(event)}
-                />
-            </div>
-            <div>
-                <label htmlFor="symbolsCheckbox">Symbols</label>
-                <input
-                    type="checkbox"
-                    id="symbolsCheckbox"
-                    name="symbols"
-                    checked={symbolsState}
-                    onChange={(event) => toggleCheckbox(event)}
-                />
-            </div>
-        </div>
-        <h3 id='errorMessage'>Error Message: {errorMessageState? errorMessageState : ""}</h3>
-        <h3 id='message'>Regular Message: {messageState? messageState : ''}</h3>
+        
+        </div></ul>
         
         <h2>Your Passwords</h2>
         <ul>
@@ -472,14 +486,18 @@ function PasswordManagerPage(){
         </ul>
         
         <h2>Share Password</h2>
-        <div><label>Enter Username: </label><input value={shareUsername} onInput={(event) => updateShareUsername(event)}></input></div>
-        <button onClick={()=> onSubmitShareRequest()}>Submit</button>
-
+        <ul>
+            <div className='sharePassword'>
+                <label>Enter Username: </label><input value={shareUsername} onInput={(event) => updateShareUsername(event)}></input>
+                <button onClick={()=> onSubmitShareRequest()}>Submit</button>
+            </div>
+        </ul>
+        
         <h2>Your Pending Share Requests</h2>
         <ul>
-            {displayedShareRequests}
+            {shareRequestListState.length <= 0? 'You have no pending share requests. ' : displayedShareRequests}
         </ul>
-            
+
         <h2>Passwords Shared with You</h2>
         <ul>
             {displayedSharedPasswords}

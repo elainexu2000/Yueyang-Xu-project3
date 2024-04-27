@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router';
+import './NavBar.css'
 
 function NavBar() {
   const location = useLocation();
@@ -37,50 +38,47 @@ function NavBar() {
   const renderNavItems = () => {
     if (location.pathname === '/login') {
       return (
-        <ul>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/register">Register</Link></li>
-        </ul>
+        <div className='navbar'>
+          <div className='navbar-element'><Link to="/">Home</Link></div>
+          <div className='navbar-element'><Link to="/register">Register</Link></div>
+        </div>
       );
     } 
     else if (location.pathname === '/register') {
       return (
-        <ul>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/login">Log In</Link></li>
-        </ul>
+        <div className='navbar'>
+          <div className='navbar-element'><Link to="/">Home</Link></div>
+          <div className='navbar-element'><Link to="/login">Log In</Link></div>
+        </div>
       );
     } 
     else 
     if (location.pathname === '/password') {
       return (
-        <ul>
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/password">Password Manager</Link></li>
-          <li><button onClick={logout}>Log Out</button></li>
-          <li>{username}</li>
-        </ul>
+        <div className='navbar'>
+          <div className='navbar-element'><Link to="/">Home</Link></div>
+          <div className='navbar-element'><Link to="/password">Password Manager</Link></div>
+          <div className='navbar-element'><button onClick={logout}>Log Out</button></div>
+          <div className='navbar-element'>Hello, {username}</div>
+        </div>
       );
     } 
     else {
       return (
-        <ul>
-          <li><Link to="/">Home</Link></li>
-          {isAuthenticated ? 
-          (
-            <>
-              <li><Link to="/password">Password Manager</Link></li>
-              <li><button onClick={logout}>Log Out</button></li>
-              <li>{username}</li>
-            </>
-          ) : 
-          (
-            <>
-              <li><Link to="/login">Log In</Link></li>
-              <li><Link to="/register">Register</Link></li>
-            </>
-          )}
-        </ul>
+        <>
+        {isAuthenticated? 
+          (<div className='navbar'>
+            <div className='navbar-element'><Link to="/">Home</Link></div>
+            <div className='navbar-element'><Link to="/password">Password Manager</Link></div>
+            <div className='navbar-element'><button onClick={logout}>Log Out</button></div>
+            <div className='navbar-element'>Hello, {username}</div>
+          </div>):
+          (<div className='navbar'>
+            <div className='navbar-element'><Link to="/">Home</Link></div>
+            <div className='navbar-element'><Link to="/login">Log In</Link></div>
+            <div className='navbar-element'><Link to="/register">Register</Link></div>
+          </div>)}
+        </>
       );
     }
   };

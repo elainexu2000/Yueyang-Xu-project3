@@ -24,20 +24,19 @@ app.use('/api/password', passwordRouter);
 app.use('/api/passwordUser', passwordUserRouter);
 app.use('/api/share', passwordShareRouter);
 
-//uncomment when done
-// let frontend_dir = path.join(__dirname, 'dist')
+let frontend_dir = path.join(__dirname, 'dist')
 
-// app.use(express.static(frontend_dir));
-// app.get('*', function (req, res) {
-//     console.log("received request");
-//     res.sendFile(path.join(frontend_dir, "index.html"));
-// });
+app.use(express.static(frontend_dir));
+app.get('*', function (req, res) {
+    console.log("received request");
+    res.sendFile(path.join(frontend_dir, "index.html"));
+});
 
-// app.listen(process.env.PORT || 8000, function() {
-//     console.log("Starting app now...")
-// })
-
-app.listen(8000, function(){
-    console.log("Starting app");
+app.listen(process.env.PORT || 8000, function() {
+    console.log("Starting app now...")
 })
+
+// app.listen(8000, function(){
+//     console.log("Starting app now...");
+// })
 

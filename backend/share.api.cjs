@@ -31,7 +31,6 @@ shareRouter.get('/passwords', async (req, res) => {
     }
     try {
         const sharedPasswordResponse = await ShareModel.getAllSharedPasswordsByUsername(username);
-        console.log(sharedPasswordResponse);
         return res.send(sharedPasswordResponse);
     } catch (error) {
         console.error(error);
@@ -93,12 +92,6 @@ shareRouter.put('/:reqId', async function(req, res){
     }
     try{
         const getShareRequestResponse = await ShareModel.getSharedRequestById(requestId);
-        console.log(getShareRequestResponse);
-        const newRequest = {
-            requesterUsername: getShareRequestResponse.requesterUsername,
-            recipientUsername: getShareRequestResponse.recipientUsername,
-            status: newStatus
-        }
         if(getShareRequestResponse != null && getShareRequestResponse.recipientUsername !== username){
             res.status(400);
             return res.send("You do not own this share request.");

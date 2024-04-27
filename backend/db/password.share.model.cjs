@@ -78,7 +78,6 @@ async function getAllSharedPasswordsByUsername(username) {
     }
 }
 
-
 module.exports = {
     addShareRequest,
     deleteShareRequest,

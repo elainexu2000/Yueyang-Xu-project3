@@ -1,11 +1,7 @@
-// import { useResolvedPath } from 'react-router';
 const cookieHelper = require('./cookie.helper.cjs');
-
 const express = require('express');
 const jwt = require('jsonwebtoken');
-
 const router = express.Router();
-
 const passwordUserModel = require('./db/password.user.model.cjs');
 
 router.post('/register', async function(request, response) {

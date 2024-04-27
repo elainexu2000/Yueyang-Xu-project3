@@ -1,7 +1,6 @@
 const express = require('express');
 const passwordRouter = express.Router();
 const PasswordModel = require('./db/password.model.cjs');
-//const ShareModel = require('./db/password.share.model.cjs');
 const cookieHelper = require('./cookie.helper.cjs');
 
 passwordRouter.post('/', async function(req, res){
@@ -84,8 +83,6 @@ passwordRouter.put('/:pwId', async function(req, res){
             return res.send("You do not own this password entry.");
         }
         const passwordUpdateResponse = await PasswordModel.updatePassword(passwordId, passwordData);
-        //const shareRequestUpdateResponse = await ShareModel.updateShareRequest(requestId, requestBody.status);
-
         return res.send(passwordUpdateResponse);
     }
     catch(error){
@@ -115,75 +112,5 @@ passwordRouter.delete('/:pwId', async function(req, res){
     return res.send("Failed to delete password entry: " + error.message);
     }
 })
-
-// POST route to create a new sharing request
-// passwordRouter.post('/share', async function(req, res) {
-//     const requestBody = req.body;
-//     const username = cookieHelper.cookieDecryptor(req);
-
-//     if (!username) {
-//         res.status(401);
-//         return res.send("You need to be logged in to share a password entry.");
-//     }
-//     if (!requestBody.recipientUsername || !requestBody.passwordId) {
-//         res.status(400);
-//         return res.send("Invalid input: please include recipient username and password ID.");
-//     }
-
-//     try {
-//         const shareRequest = await ShareModel.addShareRequest(username, requestBody.recipientUsername, requestBody.passwordId);
-//         return res.send(shareRequest);
-//     } catch (error) {
-//         res.status(400);
-//         return res.send(error);
-//     }
-// });
-
-// // GET route to retrieve all sharing requests for the user
-// passwordRouter.get('/share', async function(req, res) {
-//     const username = cookieHelper.cookieDecryptor(req);
-
-//     if (!username) {
-//         res.status(401);
-//         return res.send("You need to be logged in to view sharing requests.");
-//     }
-
-//     try {
-//         const sharingRequests = await ShareModel.getSharingRequestsForUser(username);
-//         return res.send(sharingRequests);
-//     } catch (error) {
-//         res.status(400);
-//         return res.send(error);
-//     }
-// });
-
-// // PUT route to accept or reject a sharing request
-// passwordRouter.put('/share/:requestId', async function(req, res) {
-//     const username = cookieHelper.cookieDecryptor(req);
-//     const requestId = req.params.requestId;
-//     const action = req.body.action; // 'accept' or 'reject'
-
-//     if (!username) {
-//         res.status(401);
-//         return res.send("You need to be logged in to respond to sharing requests.");
-//     }
-//     if (!action || (action !== 'accept' && action !== 'reject')) {
-//         res.status(400);
-//         return res.send("Invalid input: please specify 'accept' or 'reject' as the action.");
-//     }
-
-//     try {
-//         if (action === 'accept') {
-//             const acceptRequest = await ShareModel.acceptShareRequest(requestId, username);
-//             return res.send(acceptRequest);
-//         } else {
-//             const rejectRequest = await ShareModel.rejectShareRequest(requestId, username);
-//             return res.send(rejectRequest);
-//         }
-//     } catch (error) {
-//         res.status(400);
-//         return res.send(error);
-//     }
-// });
 
 module.exports = passwordRouter;

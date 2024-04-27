@@ -7,8 +7,6 @@ import PasswordLoginPage from './PasswordLoginPage.jsx'
 import PasswordRegisterPage from './PasswordRegisterPage.jsx'
 import Home from './Home.jsx'
 
-//import './index.css'
-
 const passwordRouter = createBrowserRouter([
   {
     path: '/login',
@@ -27,7 +25,6 @@ const passwordRouter = createBrowserRouter([
     element: <Home/>
   }
 ])
-
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
